@@ -29,7 +29,7 @@ async function main() {
 
     // encrypts the entire database:
 
-    // const secret = "Thisisourlittlesecret.";
+    // const secret = "SECRET";
     // userSchema.plugin(encrypt, {
     //     secret: secret
     // });
