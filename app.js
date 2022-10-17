@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const port = 3000;
+const md5 = require('md5');
 
 
 const app = express();
@@ -16,7 +17,6 @@ console.log(process.env.API_KEY);
 async function main() {
 
     const mongoose = require('mongoose');
-    const encrypt = require('mongoose-encryption');
 
     await mongoose.connect('mongodb://localhost:27017/userDB', {
         useNewURLParser: true,
@@ -25,19 +25,6 @@ async function main() {
     const userSchema = new mongoose.Schema({
         email: String,
         password: String
-    });
-
-    // encrypts the entire database:
-
-    // const secret = "SECRET";
-    // userSchema.plugin(encrypt, {
-    //     secret: secret
-    // });
-
-    // encrypts only certain fields:
-    userSchema.plugin(encrypt, {
-        secret: process.env.SECRET,
-        encryptedFields: ['password']
     });
 
     const User = new mongoose.model("User", userSchema);
@@ -58,7 +45,7 @@ async function main() {
         .post((req, res) => {
             const newUser = new User({
                 email: req.body.username,
-                password: req.body.password
+                password: md5(req.body.password)
             });
             newUser.save((err) => {
                 if (err) {
@@ -71,7 +58,7 @@ async function main() {
 
     app.post("/login", async (req, res) => {
         const username = req.body.username;
-        const password = req.body.password;
+        const password = md5(req.body.password);
 
         const foundUser = await User.findOne({
             email: username
